@@ -25,6 +25,7 @@ package br.com.mobilemind.api.droidutil.rest;
 public class RestException extends RuntimeException {
 
     private int httpSatatus = -1;
+    private String content;
 
     public RestException(String message, Exception e) {
         super(message, e);
@@ -47,11 +48,21 @@ public class RestException extends RuntimeException {
         this.httpSatatus = httpStatus;
     }
 
+    public RestException(int httpStatus, String message, String content) {
+        super(message);
+        this.httpSatatus = httpStatus;
+        this.content = content;
+    }
+
     public RestException(int httpStatus) {
         this.httpSatatus = httpStatus;
     }
 
     public int getHttpSatatus() {
         return httpSatatus;
+    }
+
+    public String getContent(){
+        return this.content;
     }
 }

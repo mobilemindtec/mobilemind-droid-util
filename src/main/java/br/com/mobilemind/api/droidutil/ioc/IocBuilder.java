@@ -64,8 +64,10 @@ public class IocBuilder {
                     if(this.debug)
                         Log.i("IOC", "## set activity content view");
                 }
-            } else {
-                throw new RuntimeException("object instalce can be Activity");
+            } 
+
+            if(this.activity == null) {
+                throw new RuntimeException("Activity can't be null");
             }
 
             for (Field f : injectViewList) {

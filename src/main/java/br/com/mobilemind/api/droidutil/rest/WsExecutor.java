@@ -66,6 +66,7 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.Header;
 
 /**
  * Classe que auxilia na conversa com WebService padrao Rest
@@ -100,6 +101,8 @@ public class WsExecutor<T> {
     private Context context;
     private String charset = RestTools.CHARSET_UTF8;
     private boolean asString;
+
+    private Map<String, String> responseHeaders = new HashMap<String, String>();
 
     public WsExecutor() {
         this(30000, 10);
@@ -287,6 +290,10 @@ public class WsExecutor<T> {
         return this;
     }
 
+    public Map<String, String> getResponseHeaders() {
+        return this.responseHeaders;
+    }
+
     /**
      * Object entity converter
      *
@@ -370,7 +377,7 @@ public class WsExecutor<T> {
         HttpRequestBase request = null;
         HttpResponse response = null;
         HttpEntity httpEntity = null;
-        String result = null;
+        Object result = null;
         InputStream instream = null;
 
         if (this.basicAuthentication != null) {
@@ -475,20 +482,25 @@ public class WsExecutor<T> {
 
         this.httpStatus = response.getStatusLine().getStatusCode();
 
-        if (this.httpStatus != RestStatus.OK) {
-            throw new RestException(this.httpStatus, response.getStatusLine().getReasonPhrase());
-        }
+        Header headers[] = response.getAllHeaders();
+
+        for(Header header : headers)
+            this.responseHeaders.put(header.getName(), header.getValue());
+
 
         httpEntity = response.getEntity();
+        String content = null;
 
         if (httpEntity != null) {
+
             try {
                 instream = httpEntity.getContent();
-                result = convertStreamToString(instream);
+                content = convertStreamToString(instream);
+                result = content;
             } catch (Exception e) {
                 AppLogger.getInstance().log(Level.SEVERE, this.getClass(),
                         "error convert response content", e);
-                throw new RestException(e.getMessage(), e);
+                throw new RestException("error convert response content: " + e.getMessage(), e);
             } finally {
                 if (instream != null) {
                     try {
@@ -503,12 +515,18 @@ public class WsExecutor<T> {
 
             if (!asString) {
                 if (converter != null) {
-                    return converter.toObject(result);
+                    AppLogger.info(this.getClass(), "convert result");
+                    result = converter.toObject(content);
                 }
             }
-            return result;
         }
-        return null;
+
+
+        if (this.httpStatus != RestStatus.OK) {
+            throw new RestException(this.httpStatus, response.getStatusLine().getReasonPhrase(), content);
+        }
+
+        return result;
     }
 
     private String convertStreamToString(InputStream is)

@@ -182,8 +182,13 @@ public class Dialog {
             }
         });
         AlertDialog alert = alertbox.create();
-        alert.setIcon(QUESTION_ICON_ICON_RESOURCE);
-        alert.setTitle(TITLE_DIALOG_RESOURCE);
+
+        if(QUESTION_ICON_ICON_RESOURCE > -1)
+            alert.setIcon(QUESTION_ICON_ICON_RESOURCE);
+
+        if(TITLE_DIALOG_RESOURCE > -1)
+            alert.setTitle(TITLE_DIALOG_RESOURCE);
+
         alert.show();
     }
 
@@ -213,8 +218,13 @@ public class Dialog {
             }
         });
         AlertDialog alert = alertbox.create();
-        alert.setIcon(QUESTION_ICON_ICON_RESOURCE);
-        alert.setTitle(TITLE_DIALOG_RESOURCE);
+
+        if(QUESTION_ICON_ICON_RESOURCE > -1)
+            alert.setIcon(QUESTION_ICON_ICON_RESOURCE);
+
+        if(TITLE_DIALOG_RESOURCE > -1)
+            alert.setTitle(TITLE_DIALOG_RESOURCE);
+
         alert.show();
     }
 
@@ -222,7 +232,7 @@ public class Dialog {
         createAlert(context, message, resource, null);
     }
 
-    private static void createAlert(Context context, String message, int resource,
+    private static void createAlert(Context context, String message, int iconResource,
             final OnClickListener event) {
         final AlertDialog.Builder alertbox = new AlertDialog.Builder(context);
         alertbox.setMessage(message);
@@ -237,20 +247,30 @@ public class Dialog {
             });
         }
         AlertDialog alert = alertbox.create();
-        alert.setTitle(TITLE_DIALOG_RESOURCE);
-        alert.setIcon(resource);
+
+        if(TITLE_DIALOG_RESOURCE > -1)
+            alert.setTitle(TITLE_DIALOG_RESOURCE);
+        
+        if(iconResource > -1)
+            alert.setIcon(iconResource);
+
         alert.show();
     }
 
-    private static void createAlert(Context context, String message, int resource,
+    private static void createAlert(Context context, String message, int iconResource,
             final OnClickListener event, final DialogInterface.OnCancelListener cancelListener) {
         final AlertDialog.Builder alertbox = new AlertDialog.Builder(context);
         alertbox.setMessage(message);
         alertbox.setPositiveButton(OK_DIALOG_RESOURCE, event);
         alertbox.setOnCancelListener(cancelListener);
         AlertDialog alert = alertbox.create();
-        alert.setTitle(TITLE_DIALOG_RESOURCE);
-        alert.setIcon(resource);
+
+        if(TITLE_DIALOG_RESOURCE > -1)
+            alert.setTitle(TITLE_DIALOG_RESOURCE);
+        
+        if(iconResource > -1)
+            alert.setIcon(iconResource);
+
         alert.setCancelable(false);
         alert.show();
     }
@@ -262,7 +282,9 @@ public class Dialog {
     public static AlertDialog showOptions(Context context, String[] options, DialogInterface.OnClickListener event) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        builder.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+        if(TITLE_DIALOG_RESOURCE > -1)
+            builder.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+
         builder.setItems(options, event);
         return builder.create();
     }
@@ -271,7 +293,10 @@ public class Dialog {
             int... resId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         String options[] = new String[resId.length];
-        builder.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+
+        if(TITLE_DIALOG_RESOURCE > -1)
+            builder.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+
         for (int i = 0; i < resId.length; i++) {
             options[i] = context.getString(resId[i]);
         }
@@ -281,18 +306,31 @@ public class Dialog {
 
     public static AlertDialog createErrorDialog(Context context, String message, OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+
+        if(TITLE_DIALOG_RESOURCE > -1)
+            builder.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+
+
         builder.setMessage(message);
-        builder.setIcon(ERROR_ICON_RESOURCE);
+
+        if(ERROR_ICON_RESOURCE > -1)
+            builder.setIcon(ERROR_ICON_RESOURCE);
+
         builder.setPositiveButton(OK_DIALOG_RESOURCE, listener);
         return builder.create();
     }
 
     public static AlertDialog createSuccess(Context context, String message, OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+        
+        if(TITLE_DIALOG_RESOURCE > -1)
+            builder.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+
         builder.setMessage(message);
-        builder.setIcon(OK_ICON_ICON_RESOURCE);
+
+        if(OK_ICON_ICON_RESOURCE > -1)
+            builder.setIcon(OK_ICON_ICON_RESOURCE);
+
         builder.setPositiveButton(OK_DIALOG_RESOURCE, listener);
         return builder.create();
     }
@@ -324,7 +362,10 @@ public class Dialog {
     }
 
     public static AlertDialog.Builder showInput0(AlertDialog.Builder alertbox, Context context, String message, int inputType, boolean show, final InputRespotaListener respotaListener) {
-        alertbox.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+        
+        if(TITLE_DIALOG_RESOURCE > -1)
+            alertbox.setTitle(context.getString(TITLE_DIALOG_RESOURCE));
+
         alertbox.setMessage(message);
         alertbox.setCancelable(false);
         final EditText textEdit = new EditText(context);
