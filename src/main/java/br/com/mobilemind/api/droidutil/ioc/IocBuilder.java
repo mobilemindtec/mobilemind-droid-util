@@ -31,6 +31,8 @@ import android.view.View;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import br.com.mobilemind.api.utils.ClassUtil;
 
@@ -42,6 +44,8 @@ public class IocBuilder {
 
     private Activity activity;
     private boolean debug;
+
+    private static Map<String, Object> CACHE = new HashMap<String, Object>();
 
     public IocBuilder onDebug(){
         this.debug = true;
@@ -97,10 +101,26 @@ public class IocBuilder {
                         newObject = activity.getResources();
                         resolve = false;
                     } else {
-                        newObject = type.newInstance();
+
+                        Object singleton = type.getAnnotation(Singleton.class);
+
+                        if(singleton != null){
+                            String typeName = type.getName();
+
+                            if(CACHE.containsKey(typeName)){
+                                newObject = CACHE.get(typeName);
+                            }else{
+                                newObject = type.newInstance();
+                                CACHE.put(typeName, newObject);
+                            }
+                        }else{
+                            newObject = type.newInstance();
+                        }
+                            
                     }
 
                     f.set(instance, newObject);
+
                     if(this.debug)
                         Log.i("IOC", "## set value to field " + f.getName() + " of type " + type.getName());
 

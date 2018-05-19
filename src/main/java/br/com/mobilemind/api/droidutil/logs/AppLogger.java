@@ -23,11 +23,10 @@ package br.com.mobilemind.api.droidutil.logs;
  */
 
 import android.util.Log;
-
+import java.util.logging.Level;
 import br.com.mobilemind.api.utils.log.MMLogger;
 import java.text.MessageFormat;
-import java.util.logging.Level;
-
+import br.com.mobilemind.api.droidutil.logs.LogWriter;
 /**
  *
  * @author Ricardo Bocchi
@@ -69,24 +68,14 @@ public class AppLogger implements br.com.mobilemind.api.utils.log.AppLogger {
     public static void error(Class clazz, Exception ex, String message) {
         appLogger.log(Level.SEVERE, clazz, message, ex);
     }
+    
 
     @Override
     public void log(Level level, Class clazz, String message) {
         if (clazz == null) {
             clazz = this.getClass();
         }
-
-        if (builder.isFail()) {
-            if (level == Level.FINE) {
-                Log.d(clazz.getSimpleName(), message);
-            } else if (level == Level.INFO) {
-                Log.i(clazz.getSimpleName(), message);
-            } else if (level == Level.SEVERE) {
-                Log.e(clazz.getSimpleName(), message);
-            } else {
-                Log.i(clazz.getSimpleName(), message);
-            }
-        }
+        
 
         this.logWrite(level, clazz, message, null);
     }
@@ -95,19 +84,7 @@ public class AppLogger implements br.com.mobilemind.api.utils.log.AppLogger {
     public void log(Level level, Class clazz, String message, Exception e) {
         if (clazz == null) {
             clazz = this.getClass();
-        }
-
-        if (builder.isFail()) {
-            if (level == Level.FINE) {
-                Log.d(clazz.getSimpleName(), message, e);
-            } else if (level == Level.INFO) {
-                Log.i(clazz.getSimpleName(), message, e);
-            } else if (level == Level.SEVERE) {
-                Log.e(clazz.getSimpleName(), message, e);
-            } else {
-                Log.i(clazz.getSimpleName(), message, e);
-            }
-        }
+        }    
 
         this.logWrite(level, clazz, message, e);
     }
@@ -117,19 +94,7 @@ public class AppLogger implements br.com.mobilemind.api.utils.log.AppLogger {
 
         if (clazz == null) {
             clazz = this.getClass();
-        }
-
-        if (builder.isFail()) {
-            if (level == Level.FINE) {
-                Log.d(clazz.getSimpleName(), e.getMessage(), e);
-            } else if (level == Level.INFO) {
-                Log.i(clazz.getSimpleName(), e.getMessage(), e);
-            } else if (level == Level.SEVERE) {
-                Log.e(clazz.getSimpleName(), e.getMessage(), e);
-            } else {
-                Log.i(clazz.getSimpleName(), e.getMessage(), e);
-            }
-        }
+        }    
 
         this.logWrite(level, clazz, null, e);
     }
@@ -142,31 +107,14 @@ public class AppLogger implements br.com.mobilemind.api.utils.log.AppLogger {
             return;
         }
 
-        if (builder.isFail()) {
-            Log.e(this.getClass().getName(), "Long not is enabled");
-            return;
-        }
-
         try {
-            org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(clazz);
 
             if (e != null && message == null) {
                 message = e.getMessage();
             }
 
-            if (e == null) {
-                if (severe) {
-                    logger.error(message);
-                } else {
-                    logger.info(message);
-                }
-            } else {
-                if (severe) {
-                    logger.error(message, e);
-                } else {
-                    logger.info(message, e);
-                }
-            }
+            LogWriter.write(message, e);
+
         } catch (Exception ex) {
         }
     }

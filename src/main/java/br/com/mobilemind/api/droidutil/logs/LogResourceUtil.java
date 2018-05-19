@@ -26,6 +26,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import br.com.mobilemind.api.droidutil.logs.LogWriter;
 
 /**
  *
@@ -70,7 +71,7 @@ public class LogResourceUtil {
         }
     }
 
-    public static String getString(String key) {
-        return props.getProperty(key);
+    public static String getString(String key, String defaultValue) {
+        return props.getProperty(key, defaultValue);
     }
 }

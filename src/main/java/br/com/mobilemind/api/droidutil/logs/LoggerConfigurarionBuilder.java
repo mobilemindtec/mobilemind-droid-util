@@ -24,7 +24,7 @@ package br.com.mobilemind.api.droidutil.logs;
 
 import android.os.Environment;
 import android.util.Log;
-import de.mindpipe.android.logging.log4j.LogConfigurator;
+import com.google.code.microlog4android.config.PropertyConfigurator;
 import java.io.File;
 
 /**
@@ -34,56 +34,24 @@ import java.io.File;
 public class LoggerConfigurarionBuilder {
 
     public static String FILE_LOG = "";
-    private boolean fail;
-
-    public boolean isFail() {
-        return fail;
-    }
 
     public void build() {
 
 
-        boolean useExternalStorage = Boolean.valueOf(LogResourceUtil.getString("log.use.external.storage"));
-        String fileName = LogResourceUtil.getString("log.file.name");
-        String pathName = LogResourceUtil.getString("log.file.path.name");
-        AppLogger.DEBUG_MODE = Boolean.valueOf(LogResourceUtil.getString("log.debug.mode"));
-        long maxFileSize = Long.parseLong(LogResourceUtil.getString("log.max.size.file"));
+        String fileName = LogResourceUtil.getString("log.file.name", "file.log");
+        String pathName = LogResourceUtil.getString("log.file.path.name", "mobilemind");
+        AppLogger.DEBUG_MODE = Boolean.valueOf(LogResourceUtil.getString("log.debug.mode", "FALSE"));
+        int maxFileSize = Integer.parseInt(LogResourceUtil.getString("log.max.size.file", LogWriter.maxSize + ""));
+        int maxFiles = Integer.parseInt(LogResourceUtil.getString("log.max.files", "10"));
 
+        LogWriter.fileName = fileName;
+        LogWriter.filePath = pathName;
+        LogWriter.maxSize = maxFileSize;
+        LogWriter.maxFiles = maxFiles;
 
-        final LogConfigurator logConfigurator = new LogConfigurator();
+        FILE_LOG = LogWriter.logFile.getAbsolutePath();
 
-        if (useExternalStorage) {
-            Log.d("LOG", "use external storage " + Environment.getExternalStorageDirectory());
-            File file = new File(Environment.getExternalStorageDirectory() + File.separator + pathName);
-            if (!file.exists()) {
-                try {
-                    file.mkdir();
-                } catch (Exception e) {
-                    Log.e(this.getClass().getName(), "error create log directory", e);
-                    this.fail = true;
-                    return;
-                }
-            }
-
-            FILE_LOG = file.getAbsolutePath() + File.separator + fileName;
-            logConfigurator.setFileName(FILE_LOG);
-        } else {
-            Log.d("LOG", "not use external storage ");
-            FILE_LOG = pathName + File.separator + fileName;
-            logConfigurator.setFileName(FILE_LOG);
-        }
-
-        logConfigurator.setRootLevel(org.apache.log4j.Level.DEBUG);
-        logConfigurator.setMaxFileSize(maxFileSize);
-        logConfigurator.setUseFileAppender(true);
-        logConfigurator.setLevel("org.apache", org.apache.log4j.Level.INFO);
-
-        try {
-            logConfigurator.configure();
-        } catch (Exception e) {
-            Log.e(this.getClass().getName(), "error create log directory", e);
-            this.fail = true;
-            return;
-        }
     }
+
+
 }

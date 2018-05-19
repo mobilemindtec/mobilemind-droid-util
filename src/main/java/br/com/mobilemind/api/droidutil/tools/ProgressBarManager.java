@@ -104,7 +104,7 @@ public class ProgressBarManager {
     public ProgressDialog createProgressDialog() {
 
         if (MobileMindUtil.isNullOrEmpty(title)) {
-            title = "Alert";
+            title = "Aguarde..";
         }
 
         if (MobileMindUtil.isNullOrEmpty(message)) {

@@ -31,7 +31,7 @@ public class ConnectionTools {
     public static boolean isConnected(Context context) {
         ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity == null) {
-            AppLogger.info(ConnectionTools.class, "ConnectionTools.isConnected(Context context) : CONNECTIVITY_SERVICE is null!!");
+            AppLogger.error(ConnectionTools.class, "ConnectionTools.isConnected(Context context) : CONNECTIVITY_SERVICE is null!!");
         } else {
             NetworkInfo[] info = connectivity.getAllNetworkInfo();
             if (info != null) {
@@ -40,8 +40,13 @@ public class ConnectionTools {
                         return true;
                     }
                 }
+            }else{
+                AppLogger.error(ConnectionTools.class, "ConnectionTools.isConnected(Context context) : no NetworkInfo found");
             }
         }
+
+        AppLogger.error(ConnectionTools.class, "ConnectionTools.isConnected(Context context) : no NetworkInfo connected found");
+
         return false;
     }
 
