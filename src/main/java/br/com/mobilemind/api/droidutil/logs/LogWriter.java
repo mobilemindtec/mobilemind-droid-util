@@ -55,17 +55,27 @@ public class LogWriter {
     private static File sdCard;
     static File logFile;
 
-    public static void write(String message, Throwable exception) {
+    public static void logFileInit(){
 
         String sdCard = java.lang.System.getenv("EXTERNAL_STORAGE");
         File parent = new File(sdCard, filePath);
-        
+
         if(logFile == null){
             logFile = new File(parent, fileName);            
             if (!parent.exists()) {
                 parent.mkdirs();
             }
-        }
+        }        
+    }
+
+    public static void write(String message, Throwable exception) {
+
+        String sdCard = java.lang.System.getenv("EXTERNAL_STORAGE");
+        File parent = new File(sdCard, filePath);
+        
+
+        logFileInit();
+
 
         try {
 

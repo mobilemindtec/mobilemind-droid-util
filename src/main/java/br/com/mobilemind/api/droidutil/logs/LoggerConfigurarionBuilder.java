@@ -24,7 +24,6 @@ package br.com.mobilemind.api.droidutil.logs;
 
 import android.os.Environment;
 import android.util.Log;
-import com.google.code.microlog4android.config.PropertyConfigurator;
 import java.io.File;
 
 /**
@@ -49,6 +48,7 @@ public class LoggerConfigurarionBuilder {
         LogWriter.maxSize = maxFileSize;
         LogWriter.maxFiles = maxFiles;
 
+        LogWriter.logFileInit();
         FILE_LOG = LogWriter.logFile.getAbsolutePath();
 
     }
