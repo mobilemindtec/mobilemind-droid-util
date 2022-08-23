@@ -5,23 +5,25 @@
 
     <groupId>br.com.mobilemind.api</groupId>
     <artifactId>mobilemind-droid-util</artifactId>
-    <version>2.1</version>
+    <version>2.2</version>
     <packaging>jar</packaging>
     <name>Mobile Mind - Droid Util</name>
 
+    <!--
     <distributionManagement>
         <repository>
             <id>mobile-mind-droid-m2</id>
             <name>Mobile Mind Nexus</name>
-            <url>http://nexus.mobilemind.com.br/repository/mobile-mind-droid-m2</url>
+            <url>https://raw.githubusercontent.com/mobilemindtec/m2/master</url>
         </repository>
     </distributionManagement>
+    -->
 
     <repositories>
         <repository>
             <id>mobile-mind-m2</id>
             <name>vineetmanohar</name>
-            <url>http://nexus.mobilemind.com.br/repository/mobile-mind-droid-m2</url>
+            <url>https://raw.githubusercontent.com/mobilemindtec/m2/master</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -44,7 +46,7 @@
                     <groupId>org.json</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>        
+        </dependency>
 
 
         <dependency>
@@ -58,46 +60,24 @@
             <artifactId>junit</artifactId>
             <version>4.8</version>
             <scope>test</scope>
-        </dependency>            
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20220320</version>
+        </dependency>
+
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>portal-war</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>enableCiProfile</name>
-                    <value>true</value>
-                </property>
-            </activation> 
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>license-maven-plugin</artifactId>
-                        <configuration>
-                            <licenseName>gpl_v2</licenseName>
-                            <organizationName>Mobile Mind Empresa de Tecnologia</organizationName>
-                            <inceptionYear>2012</inceptionYear>
-                            <verbose>true</verbose>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>first</id>
-                                <goals>
-                                    <goal>update-file-header</goal>
-                                </goals>
-                                <phase>process-sources</phase>
-                            </execution>
-                        </executions>
-                    </plugin>                  
-                </plugins>                        
-
-
-            </build>
-        </profile>
-    </profiles>       
 
     <build>
         <plugins>
@@ -105,8 +85,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
 
@@ -119,7 +99,7 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-
+            <!--
               <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
@@ -136,7 +116,7 @@
                         </execution>                    
                     </executions>
                 </plugin>  
-                        
+            -->
         </plugins>
 
 

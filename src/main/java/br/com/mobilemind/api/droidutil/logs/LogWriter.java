@@ -73,8 +73,12 @@ public class LogWriter {
         String sdCard = java.lang.System.getenv("EXTERNAL_STORAGE");
         File parent = new File(sdCard, filePath);
         
-
         logFileInit();
+
+        if(!parent.canWrite()){
+            Log.e("DROIDUTIL_LOG", "cant write log at " + parent.getAbsolutePath());
+            return;
+        }
 
 
         try {

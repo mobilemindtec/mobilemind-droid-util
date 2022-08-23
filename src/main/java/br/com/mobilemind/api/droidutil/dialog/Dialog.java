@@ -48,6 +48,7 @@ public class Dialog {
     public static int CANCEL_DIALOG_RESOURCE = -1;
     public static int TITLE_DIALOG_RESOURCE = -1;
 
+
     public static void showInfo(Context context, int resource) {
         createAlert(context, context.getString(resource), INFORMATION_ICON_ICON_RESOURCE);
     }
@@ -105,6 +106,24 @@ public class Dialog {
     }
 
     public static void showSuccess(Context context, String message, final RespostaListener respostaListener) {
+        createAlert(context, message, OK_ICON_ICON_RESOURCE, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                respostaListener.onOk();
+            }
+        }, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                respostaListener.onCancel();
+            }
+        });
+    }
+
+    public static void show(Context context, String message) {
+        createAlert(context, message, OK_ICON_ICON_RESOURCE);
+    }
+
+    public static void show(Context context, String message, final RespostaListener respostaListener) {
         createAlert(context, message, OK_ICON_ICON_RESOURCE, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

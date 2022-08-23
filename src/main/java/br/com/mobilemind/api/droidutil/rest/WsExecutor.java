@@ -21,58 +21,35 @@ package br.com.mobilemind.api.droidutil.rest;
  * <http://www.gnu.org/licenses/gpl-2.0.html>.
  * #L%
  */
+
 import android.content.Context;
+import br.com.mobilemind.api.droidutil.http.Http;
+import br.com.mobilemind.api.droidutil.http.HttpException;
+import br.com.mobilemind.api.droidutil.http.Response;
+import br.com.mobilemind.api.droidutil.logs.AppLogger;
+import br.com.mobilemind.api.droidutil.tools.ConnectionTools;
+import br.com.mobilemind.api.rest.RestStatus;
+import br.com.mobilemind.api.rest.RestTools;
+import br.com.mobilemind.api.security.key.Base64;
+import br.com.mobilemind.api.utils.MobileMindUtil;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import br.com.mobilemind.api.droidutil.logs.AppLogger;
-import br.com.mobilemind.api.security.key.Base64;
-import br.com.mobilemind.api.utils.MobileMindUtil;
-import br.com.mobilemind.api.droidutil.tools.ConnectionTools;
-import br.com.mobilemind.api.rest.RestStatus;
-import br.com.mobilemind.api.rest.RestTools;
-import java.util.LinkedList;
-import java.util.List;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.AuthState;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.*;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.Header;
 
 /**
  * Classe que auxilia na conversa com WebService padrao Rest
  *
  * @author root
  */
+@Deprecated
 public class WsExecutor<T> {
 
     //private static final int TIMEOUT_MILLISEC = 10000; // = 10 seconds
@@ -92,7 +69,7 @@ public class WsExecutor<T> {
     private boolean testConnection = false;
     private Map<String, String> headerParam = new HashMap<String, String>();
     private List<String> params = new LinkedList<String>();
-    private HttpParams httpParams = new BasicHttpParams();
+    private Map<String, String> httpParams = new HashMap<String, String>();
     public int maxFechOnGet;
     private int connectionTimeOutMillisec;
     private T objectEntity;
@@ -116,7 +93,7 @@ public class WsExecutor<T> {
      *
      *
      * @param connectionTimeOutMillisec time out to http connection
-     * @param maxFech max returned records per request
+     * @param maxFechOnGet max returned records per request
      */
     public WsExecutor(int connectionTimeOutMillisec, int maxFechOnGet) {
         this(connectionTimeOutMillisec, maxFechOnGet, null);
@@ -127,8 +104,8 @@ public class WsExecutor<T> {
     }
 
     public WsExecutor(int connectionTimeOutMillisec, int maxFechOnGet, Context context) {
-        HttpConnectionParams.setConnectionTimeout(this.httpParams, connectionTimeOutMillisec);
-        HttpConnectionParams.setSoTimeout(this.httpParams, connectionTimeOutMillisec);
+        //HttpConnectionParams.setConnectionTimeout(this.httpParams, connectionTimeOutMillisec);
+        //HttpConnectionParams.setSoTimeout(this.httpParams, connectionTimeOutMillisec);
         this.maxFechOnGet = maxFechOnGet;
         this.connectionTimeOutMillisec = connectionTimeOutMillisec;
         this.context = context;
@@ -315,43 +292,43 @@ public class WsExecutor<T> {
         return this;
     }
 
-    public String executeGetAsString() throws RestException {
+    public String executeGetAsString() throws RestException, IOException {
         this.asString = true;
         return (String) this.execute(HTTP_GET);
     }
 
-    public String executePostAsString() throws RestException {
+    public String executePostAsString() throws RestException, IOException {
         this.asString = true;
         return (String) this.execute(HTTP_POST);
     }
 
-    public String executeDeleteAsString() throws RestException {
+    public String executeDeleteAsString() throws RestException, IOException {
         this.asString = true;
         return (String) this.execute(HTTP_DELETE);
     }
 
-    public String executePutAsString() throws RestException {
+    public String executePutAsString() throws RestException, IOException {
         this.asString = true;
         return (String) this.execute(HTTP_PUT);
     }
 
-    public T executeGet() throws RestException {
+    public T executeGet() throws RestException, IOException {
         return (T) this.execute(HTTP_GET);
     }
 
-    public T executePost() throws RestException {
+    public T executePost() throws RestException, IOException {
         return (T) this.execute(HTTP_POST);
     }
 
-    public T executeDelete() throws RestException {
+    public T executeDelete() throws RestException, IOException {
         return (T) this.execute(HTTP_DELETE);
     }
 
-    public T executePut() throws RestException {
+    public T executePut() throws RestException, IOException {
         return (T) this.execute(HTTP_PUT);
     }
 
-    private Object execute(int type) throws RestException {
+    private Object execute(int type) throws RestException, IOException {
         try {
             return this.execute0(type);
         } finally {
@@ -367,25 +344,22 @@ public class WsExecutor<T> {
         }
     }
 
-    private Object execute0(int type) throws RestException {
+    private Object execute0(int type) throws RestException, IOException {
 
         if (this.testConnection) {
             this.valitetConnection();
         }
 
-        HttpClient client = new DefaultHttpClient(httpParams);
-        HttpRequestBase request = null;
-        HttpResponse response = null;
-        HttpEntity httpEntity = null;
+
+        //HttpClient client = new DefaultHttpClient(httpParams);
+        //HttpRequestBase request = null;
+        //HttpResponse response = null;
+        //HttpEntity httpEntity = null;
         Object result = null;
         InputStream instream = null;
 
         if (this.basicAuthentication != null) {
-            Credentials credentials = new UsernamePasswordCredentials(this.basicAuthentication.getUsername(), this.basicAuthentication.getPassword());
-            BasicCredentialsProvider provider = new BasicCredentialsProvider();
-            AuthScope scope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
-            provider.setCredentials(scope, credentials);
-            ((DefaultHttpClient) client).setCredentialsProvider(provider);
+            httpParams.put(BasicAuthentication.AUTHENTICATION, this.basicAuthentication.toBase64());
         }
 
         String url = createUrl();
@@ -397,105 +371,93 @@ public class WsExecutor<T> {
             }
         }
 
-        switch (type) {
-            case HTTP_GET:
-                request = new HttpGet(url);
-                AppLogger.info(getClass(), "executing HTTP GET operation");
-                break;
-            case HTTP_POST:
-                request = new HttpPost(url);
-                try {
-                    ((HttpPost) request).setEntity(new ByteArrayEntity(this.entity.getBytes(
-                            charset)));
-                } catch (Exception e) {
-                    AppLogger.getInstance().log(Level.SEVERE, this.getClass(),
-                            "error set request entity", e);
-                    throw new RestException(e.getMessage(), e);
-                }
-                AppLogger.info(getClass(), "executing HTTP POST operation");
-                break;
-            case HTTP_DELETE:
-                request = new HttpDelete(url);
-                AppLogger.info(getClass(), "executing HTTP DELETE operation");
-                break;
-            case HTTP_PUT:
-                request = new HttpPut(url);
-                try {
-                    ((HttpPut) request).setEntity(new ByteArrayEntity(this.entity.getBytes(
-                            charset)));
-                } catch (Exception e) {
-                    AppLogger.getInstance().log(Level.SEVERE, this.getClass(),
-                            "error set request entity", e);
-                    throw new RestException(e.getMessage(), e);
-                }
-                AppLogger.info(getClass(), "executing HTTP PUT operation");
-                break;
-        }
+        Response response = null;
 
         AppLogger.info(this.getClass(), "base url [" + url + "]");
 
         if (this.entity != null && this.entity.length() < 10000) {
             AppLogger.info(this.getClass(), "send entity message [" + this.entity + "]");
         }
-        AppLogger.info(this.getClass(), "request type [" + request.getClass().getSimpleName() + "]");
 
-        request.setHeader("Content-Type", this.mediaType);
+        this.httpParams.put("Content-Type", this.mediaType);
 
         if (!MobileMindUtil.isNullOrEmpty(this.authentication)) {
             if (this.encodeAuthenticationBase64) {
                 AppLogger.info(getClass(), "encode authentication to base64");
-                request.setHeader("Authentication",
+                this.httpParams.put(BasicAuthentication.AUTHENTICATION,
                         Base64.encodeBytes(this.authentication.getBytes()));
             } else {
                 AppLogger.info(getClass(), "don't enconde authentication [" + this.authentication + "]");
-                request.setHeader("Authentication", this.authentication);
-            }
-        }
-
-        if (!this.headerParam.isEmpty()) {
-            for (String key : this.headerParam.keySet()) {
-                String value = this.headerParam.get(key);
-                request.setHeader(key, value);
-                AppLogger.info(getClass(), "add heade[" + key + ":" + value + "]");
+                this.httpParams.put(BasicAuthentication.AUTHENTICATION,
+                        this.authentication);
             }
         }
 
         try {
-            response = client.execute(request);
-        } catch (HttpHostConnectException e) {
-            AppLogger.getInstance().log(Level.SEVERE, this.getClass(),
-                    "error execute httpCliente request", e);
-            if (e.getMessage().contains("refused")) {
-                throw new RestException(RestStatus.HTTP_CONNECTION_REFUSED, "conneciton refused");
-            } else {
-                throw new RestException(e.getMessage(), e);
+
+            switch (type) {
+                case HTTP_GET:
+                    response = new Http()
+                            .get(url, this.httpParams);
+                    AppLogger.info(getClass(), "executing HTTP GET operation");
+                    break;
+                case HTTP_POST:
+                    response = new Http()
+                            .post(url, this.entity, this.headerParam);
+                    AppLogger.info(getClass(), "executing HTTP POST operation");
+                    break;
+                case HTTP_DELETE:
+                    response = new Http()
+                            .delete(url, this.entity ,this.httpParams);
+                    AppLogger.info(getClass(), "executing HTTP DELETE operation");
+                    break;
+                case HTTP_PUT:
+                    response = new Http()
+                            .put(url, this.entity ,this.httpParams);
+                    AppLogger.info(getClass(), "executing HTTP PUT operation");
+                    break;
             }
-        } catch (ConnectTimeoutException e) {
-            throw new RestException(RestStatus.HTTP_CONNECTION_TIME_OUT, "connection timeout");
-        } catch (Exception e) {
+
+        }catch (HttpException e){
+
+            if(e.getCause().getMessage().contains("refused")){
+                AppLogger.getInstance().log(Level.SEVERE, this.getClass(),
+                        "error execute httpCliente request", e);
+                if (e.getMessage().contains("refused")) {
+                    throw new RestException(RestStatus.HTTP_CONNECTION_REFUSED, "conneciton refused");
+                } else {
+                    throw new RestException(e.getMessage(), e);
+                }
+            } else if(e.getCause().getMessage().contains("timeout")){
+                throw new RestException(RestStatus.HTTP_CONNECTION_TIME_OUT, "connection timeout");
+            } else {
+                throw e;
+            }
+        }
+        catch (Exception e) {
             AppLogger.getInstance().log(Level.SEVERE, this.getClass(),
                     "error execute httpCliente request", e);
             throw new RestException(e.getMessage(), e);
         }
 
-        AppLogger.info(getClass(), "Http Status Returned [" + response.getStatusLine().toString() + "]");
+        AppLogger.info(getClass(), "Http Status Returned [" + response.getHttpStatus() + "]");
 
-        this.httpStatus = response.getStatusLine().getStatusCode();
+        this.httpStatus = response.getHttpStatus();
 
-        Header headers[] = response.getAllHeaders();
+        Map<String, String> responseHeaders = response.getHeaders();
 
-        for(Header header : headers)
-            this.responseHeaders.put(header.getName(), header.getValue());
+        for(Map.Entry<String, String> entry : responseHeaders.entrySet())
+            this.responseHeaders.put(entry.getKey(), entry.getValue());
 
 
-        httpEntity = response.getEntity();
+        InputStream httpEntity = response.getEntity();
         String content = null;
 
         if (httpEntity != null) {
 
             try {
-                instream = httpEntity.getContent();
-                content = convertStreamToString(instream);
+                //instream = httpEntity.getContent();
+                content = convertStreamToString(httpEntity);
                 result = content;
             } catch (Exception e) {
                 AppLogger.getInstance().log(Level.SEVERE, this.getClass(),
@@ -523,7 +485,7 @@ public class WsExecutor<T> {
 
 
         if (this.httpStatus != RestStatus.OK) {
-            throw new RestException(this.httpStatus, response.getStatusLine().getReasonPhrase(), content);
+            throw new RestException(this.httpStatus, response.transformer().errorString(), content);
         }
 
         return result;
