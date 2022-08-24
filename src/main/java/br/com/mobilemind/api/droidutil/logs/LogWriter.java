@@ -76,7 +76,7 @@ public class LogWriter {
         logFileInit();
 
         if(!parent.canWrite()){
-            Log.e("DROIDUTIL_LOG", "cant write log at " + parent.getAbsolutePath());
+            Log.d("DROIDUTIL_LOG", "cant write log at " + parent.getAbsolutePath());
             return;
         }
 

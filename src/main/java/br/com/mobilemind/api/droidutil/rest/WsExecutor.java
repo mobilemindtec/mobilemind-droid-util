@@ -67,9 +67,8 @@ public class WsExecutor<T> {
     private String mediaType = RestTools.MEDIA_TYPE_JSON;
     private boolean encodeAuthenticationBase64;
     private boolean testConnection = false;
-    private Map<String, String> headerParam = new HashMap<String, String>();
+    private Map<String, String> headers = new HashMap<String, String>();
     private List<String> params = new LinkedList<String>();
-    private Map<String, String> httpParams = new HashMap<String, String>();
     public int maxFechOnGet;
     private int connectionTimeOutMillisec;
     private T objectEntity;
@@ -173,7 +172,12 @@ public class WsExecutor<T> {
      * @return
      */
     public WsExecutor<T> addHeaderParam(String key, Object value) {
-        this.headerParam.put(key, value.toString());
+        this.addHeader(key, value);
+        return this;
+    }
+
+    public WsExecutor<T> addHeader(String key, Object value) {
+        this.headers.put(key, value.toString());
         return this;
     }
 
@@ -332,7 +336,7 @@ public class WsExecutor<T> {
         try {
             return this.execute0(type);
         } finally {
-            this.headerParam.clear();
+            this.headers.clear();
             this.params.clear();
             this.baseUrl = null;
             this.resource = null;
@@ -359,7 +363,7 @@ public class WsExecutor<T> {
         InputStream instream = null;
 
         if (this.basicAuthentication != null) {
-            httpParams.put(BasicAuthentication.AUTHENTICATION, this.basicAuthentication.toBase64());
+            headers.put(BasicAuthentication.AUTHORIZATION, "Basic " + this.basicAuthentication.toBase64());
         }
 
         String url = createUrl();
@@ -379,17 +383,18 @@ public class WsExecutor<T> {
             AppLogger.info(this.getClass(), "send entity message [" + this.entity + "]");
         }
 
-        this.httpParams.put("Content-Type", this.mediaType);
+        if(!this.headers.containsKey("Content-Type"))
+            this.headers.put("Content-Type", this.mediaType);
 
         if (!MobileMindUtil.isNullOrEmpty(this.authentication)) {
             if (this.encodeAuthenticationBase64) {
                 AppLogger.info(getClass(), "encode authentication to base64");
-                this.httpParams.put(BasicAuthentication.AUTHENTICATION,
-                        Base64.encodeBytes(this.authentication.getBytes()));
+                this.headers.put(BasicAuthentication.AUTHORIZATION,
+                        "Basic " + Base64.encodeBytes(this.authentication.getBytes()));
             } else {
                 AppLogger.info(getClass(), "don't enconde authentication [" + this.authentication + "]");
-                this.httpParams.put(BasicAuthentication.AUTHENTICATION,
-                        this.authentication);
+                this.headers.put(BasicAuthentication.AUTHORIZATION,
+                        "Basic " + this.authentication);
             }
         }
 
@@ -398,22 +403,22 @@ public class WsExecutor<T> {
             switch (type) {
                 case HTTP_GET:
                     response = new Http()
-                            .get(url, this.httpParams);
+                            .get(url, this.headers);
                     AppLogger.info(getClass(), "executing HTTP GET operation");
                     break;
                 case HTTP_POST:
                     response = new Http()
-                            .post(url, this.entity, this.headerParam);
+                            .post(url, this.entity, this.headers);
                     AppLogger.info(getClass(), "executing HTTP POST operation");
                     break;
                 case HTTP_DELETE:
                     response = new Http()
-                            .delete(url, this.entity ,this.httpParams);
+                            .delete(url, this.entity ,this.headers);
                     AppLogger.info(getClass(), "executing HTTP DELETE operation");
                     break;
                 case HTTP_PUT:
                     response = new Http()
-                            .put(url, this.entity ,this.httpParams);
+                            .put(url, this.entity ,this.headers);
                     AppLogger.info(getClass(), "executing HTTP PUT operation");
                     break;
             }

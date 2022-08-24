@@ -1,5 +1,7 @@
 package br.com.mobilemind.api.droidutil.http;
 
+import android.util.Log;
+
 import javax.annotation.Nonnull;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -47,8 +49,18 @@ public class Http {
             Response response = new Response(httpConnection.getResponseCode());
             this.transformer.setResponse(response);
 
-            response.setEntity(cloneInputStream(httpConnection.getInputStream()));
-            response.setError(cloneInputStream(httpConnection.getErrorStream()));
+
+            try{
+                response.setEntity(cloneInputStream(httpConnection.getInputStream()));
+            }catch (IOException e){
+
+            }
+
+            try{
+                response.setError(cloneInputStream(httpConnection.getErrorStream()));
+            }catch (IOException e){
+
+            }
 
             for(String fieldName : httpConnection.getHeaderFields().keySet()){
                 List values = httpConnection.getHeaderFields().get(fieldName);
@@ -79,7 +91,7 @@ public class Http {
 
             String bodyContent = request.getBody().toString();
 
-            byte[] postData = bodyContent.getBytes( sun.nio.cs.UTF_8.INSTANCE );
+            byte[] postData = bodyContent.getBytes( "UTF-8" );
             int postDataLength = postData.length;
 
             httpConnection.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
@@ -128,7 +140,7 @@ public class Http {
 
             String bodyContent = request.getBody().toString();
 
-            byte[] postData = bodyContent.getBytes( sun.nio.cs.UTF_8.INSTANCE );
+            byte[] postData = bodyContent.getBytes( "UTF-8" );
             int postDataLength = postData.length;
 
             httpConnection.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
@@ -176,7 +188,7 @@ public class Http {
 
             String bodyContent = request.getBody().toString();
 
-            byte[] postData = bodyContent.getBytes( sun.nio.cs.UTF_8.INSTANCE );
+            byte[] postData = bodyContent.getBytes( "UTF-8" );
             int postDataLength = postData.length;
 
             httpConnection.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));

@@ -29,7 +29,7 @@ import br.com.mobilemind.api.security.key.Base64;
  */
 public class BasicAuthentication {
 
-    public static final String AUTHENTICATION = "Authentication";
+    public static final String AUTHORIZATION = "Authorization";
 
     private String realm;
     private String username;
