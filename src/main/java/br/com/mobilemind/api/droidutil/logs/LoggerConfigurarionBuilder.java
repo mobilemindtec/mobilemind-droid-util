@@ -22,6 +22,7 @@ package br.com.mobilemind.api.droidutil.logs;
  * #L%
  */
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import java.io.File;
@@ -34,7 +35,7 @@ public class LoggerConfigurarionBuilder {
 
     public static String FILE_LOG = "";
 
-    public void build() {
+    public void build(Context context) {
 
 
         String fileName = LogResourceUtil.getString("log.file.name", "file.log");
@@ -48,7 +49,7 @@ public class LoggerConfigurarionBuilder {
         LogWriter.maxSize = maxFileSize;
         LogWriter.maxFiles = maxFiles;
 
-        LogWriter.logFileInit();
+        LogWriter.init(context);
         FILE_LOG = LogWriter.logFile.getAbsolutePath();
 
     }

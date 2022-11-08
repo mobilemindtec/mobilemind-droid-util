@@ -22,6 +22,7 @@ package br.com.mobilemind.api.droidutil.logs;
  * #L%
  */
 
+import android.content.Context;
 import android.util.Log;
 import java.util.logging.Level;
 import br.com.mobilemind.api.utils.log.MMLogger;
@@ -37,12 +38,12 @@ public class AppLogger implements br.com.mobilemind.api.utils.log.AppLogger {
     public static boolean DEBUG_MODE = false;
     private final static LoggerConfigurarionBuilder builder = new LoggerConfigurarionBuilder();
 
-    static {
-        builder.build();
-        MMLogger.addLogger(appLogger);
+    private AppLogger() {
     }
 
-    private AppLogger() {
+    public static void init(Context context){
+        builder.build(context);
+        MMLogger.addLogger(appLogger);
     }
 
     public static AppLogger getInstance() {
