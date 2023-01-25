@@ -104,6 +104,27 @@ public class AppLogger implements br.com.mobilemind.api.utils.log.AppLogger {
 
         boolean severe = (level == Level.SEVERE);
 
+        String[] pack = clazz.getName().split(".");
+        String tag = "";
+        String className = clazz.getSimpleName();
+
+        for(String it : pack){
+
+            if(it.equals(className))
+                break;
+            tag += it.charAt(0) + ".";
+        }
+
+        tag += className;
+
+        if(level== Level.SEVERE) {
+            Log.e(tag, message, e);
+        } else if(level== Level.INFO) {
+            Log.i(tag, message);
+        } else {
+            Log.d(tag, message);
+        }
+
         if (!severe && !DEBUG_MODE) {
             return;
         }
