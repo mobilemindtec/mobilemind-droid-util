@@ -5,24 +5,15 @@
 
     <groupId>br.com.mobilemind.api</groupId>
     <artifactId>mobilemind-droid-util</artifactId>
-    <version>2.5</version>
+    <version>2.6</version>
     <packaging>jar</packaging>
     <name>Mobile Mind - Droid Util</name>
 
-    <!--
-    <distributionManagement>
-        <repository>
-            <id>mobile-mind-droid-m2</id>
-            <name>Mobile Mind Nexus</name>
-            <url>https://raw.githubusercontent.com/mobilemindtec/m2/master</url>
-        </repository>
-    </distributionManagement>
-    -->
 
     <repositories>
         <repository>
-            <id>mobile-mind-m2</id>
-            <name>vineetmanohar</name>
+            <id>mobile-mind</id>
+            <name>mobilemind</name>
             <url>https://raw.githubusercontent.com/mobilemindtec/m2/master</url>
             <releases>
                 <enabled>true</enabled>
@@ -52,7 +43,7 @@
         <dependency>
             <groupId>br.com.mobilemind.api</groupId>
             <artifactId>mobilemind-utils</artifactId>
-            <version>1.7</version>
+            <version>1.8</version>
             <scope>provided</scope>
         </dependency>        
 
@@ -101,24 +92,6 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-            <!--
-              <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.7</version>
-                    <executions>
-                        <execution>
-                            <id>exec-one</id>
-                            <phase>install</phase>
-                            <goals>
-                                
-                                <goal>deploy</goal>
-                                
-                            </goals>                        
-                        </execution>                    
-                    </executions>
-                </plugin>  
-            -->
         </plugins>
 
 
