@@ -49,18 +49,7 @@ public class Http {
             Response response = new Response(httpConnection.getResponseCode());
             this.transformer.setResponse(response);
 
-
-            try{
-                response.setEntity(cloneInputStream(httpConnection.getInputStream()));
-            }catch (IOException e){
-
-            }
-
-            try{
-                response.setError(cloneInputStream(httpConnection.getErrorStream()));
-            }catch (IOException e){
-
-            }
+            this.tryFillResponse(httpConnection, response);
 
             for(String fieldName : httpConnection.getHeaderFields().keySet()){
                 List values = httpConnection.getHeaderFields().get(fieldName);
@@ -107,9 +96,7 @@ public class Http {
             Response response = new Response(httpConnection.getResponseCode());
             this.transformer.setResponse(response);
 
-
-            response.setEntity(cloneInputStream(httpConnection.getInputStream()));
-            response.setError(cloneInputStream(httpConnection.getErrorStream()));
+            this.tryFillResponse(httpConnection, response);
 
             for(String fieldName : httpConnection.getHeaderFields().keySet()){
                 List values = httpConnection.getHeaderFields().get(fieldName);
@@ -152,12 +139,10 @@ public class Http {
 
             httpConnection.connect();
 
-
             Response response = new Response(httpConnection.getResponseCode());
             this.transformer.setResponse(response);
 
-            response.setEntity(cloneInputStream(httpConnection.getInputStream()));
-            response.setError(cloneInputStream(httpConnection.getErrorStream()));
+            this.tryFillResponse(httpConnection, response);
 
             for(String fieldName : httpConnection.getHeaderFields().keySet()){
                 List values = httpConnection.getHeaderFields().get(fieldName);
@@ -204,9 +189,7 @@ public class Http {
             Response response = new Response(httpConnection.getResponseCode());
             this.transformer.setResponse(response);
 
-            response.setEntity(cloneInputStream(httpConnection.getInputStream()));
-            response.setError(cloneInputStream(httpConnection.getErrorStream()));
-
+            this.tryFillResponse(httpConnection, response);
 
             for(String fieldName : httpConnection.getHeaderFields().keySet()){
                 List values = httpConnection.getHeaderFields().get(fieldName);
@@ -223,6 +206,20 @@ public class Http {
             if(httpConnection != null)
                 httpConnection.disconnect();
         }
+    }
+
+    private void tryFillResponse(HttpURLConnection connection, Response response) throws IOException {
+        int httpCode = connection.getResponseCode();
+        boolean isError = httpCode >= 400;
+
+        if(isError)
+            try {
+                response.setError(cloneInputStream(connection.getErrorStream()));
+            }catch (Exception e){}
+        else
+            try {
+                response.setEntity(cloneInputStream(connection.getInputStream()));
+            }catch (Exception e){}
     }
 
 
